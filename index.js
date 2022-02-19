@@ -87,21 +87,32 @@ app.get("/callback", (req, res) => {
         //   .catch((error) => {
         //     res.send(error);
         //   });
+        // const { refresh_token } = response.data;
+        // axios
+        //   .get(
+        //     `http://localhost:8000/refresh_token?refresh_token=${refresh_token}`
+        //   )
+        //   .then((response) => {
+        //     res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+        //   })
+        //   .catch((error) => {
+        //     res.send(error);
+        //   });
 
-        const { refresh_token } = response.data;
+        const { access_token, refresh_token, expires_in } = response.data;
 
-        axios
-          .get(
-            `http://localhost:8000/refresh_token?refresh_token=${refresh_token}`
-          )
-          .then((response) => {
-            res.send(`<pre>${JSON.stringify(response.data, null, 2)}</pre>`);
-          })
-          .catch((error) => {
-            res.send(error);
-          });
+        const queryParams = querystring.stringify({
+          access_token,
+          refresh_token,
+          expires_in,
+        });
+
+        // redirect to react app
+        res.redirect(`http://localhost:3000/?${queryParams}`);
+
+        // pass along tokens in query params
       } else {
-        res.send(response);
+        res.redirect(`/?${querystring.stringify({ error: "invalid_token" })}`);
       }
     })
     .catch((error) => {
